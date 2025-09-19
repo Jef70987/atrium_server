@@ -54,7 +54,7 @@ JAZZMIN_SETTINGS = {
     "site_title": "Falkon Parlour Management",
     "site_header": "Parlour Admin",
     "site_brand": "The ATriUM ",
-    "welcome_sign": "Falkon parlour",
+    "welcome_sign": "ATriUM",
     "copyright": "FalKoN AnaLyTiKs",
     "custom_css": "css/admin_custom.css",
     
