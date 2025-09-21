@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, AbstractUser
 from datetime import timedelta, date
 from beauty_parlor.settings import AUTH_USER_MODEL as User
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
 class Request(models.Model):
@@ -59,7 +59,7 @@ class Spa(models.Model):
     slug = models.SlugField(unique=True)
     spa_name = models.CharField(max_length=20)
     owner = models.OneToOneField(User, on_delete=models.CASCADE, related_name="spa")
-    logo = models.ImageField(upload_to='spa_logos/' ,blank=True, null=True)  
+    logo = models.ImageField(upload_to='spa_logos/',storage=S3Boto3Storage() ,blank=True, null=True)  
     Subscription_status = models.ForeignKey(Subscriptions,on_delete=models.CASCADE)
     payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS, default='active')
     level = models.CharField(max_length=10, choices=LEVEL_STATUS, default='Level 0')
@@ -190,7 +190,7 @@ class Staff(models.Model):
     name = models.CharField(max_length=100)
     staff_id = models.CharField(max_length=40)
     specialization = models.CharField(max_length=100, blank=True)
-    profile_pic = models.ImageField(upload_to='staff_profile/', blank=True, null=True)
+    profile_pic = models.ImageField(upload_to='staff_profile/', storage=S3Boto3Storage(),blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -204,18 +204,18 @@ class Staff(models.Model):
 class SpaDashboard(models.Model):
     spa = models.ForeignKey(Spa, on_delete=models.CASCADE)
     venture_date = models.DateField()
-    dashboard_img1 = models.ImageField(upload_to='dashboard_img1/',blank=False, null=False)
-    dashboard_img2 = models.ImageField(upload_to='dashboard_img2/', blank=False, null=False)
-    dashboard_img3 = models.ImageField(upload_to='dashboard_img3/', blank=False, null=False)
-    dashboard_img4 = models.ImageField(upload_to='dashboard_img4/', blank=False, null=False)
-    dashboard_img5 = models.ImageField(upload_to='dashboard_img5/', blank=False, null=False)
-    dashboard_img6 = models.ImageField(upload_to='dashboard_img6/', blank=False, null=False)
-    dashboard_img7 = models.ImageField(upload_to='dashboard_img7/',blank=False, null=False)
-    dashboard_img8 = models.ImageField(upload_to='dashboard_img8/',blank=False, null=False)
+    dashboard_img1 = models.ImageField(upload_to='dashboard_img1/',storage=S3Boto3Storage(),blank=False, null=False)
+    dashboard_img2 = models.ImageField(upload_to='dashboard_img2/', storage=S3Boto3Storage(),blank=False, null=False)
+    dashboard_img3 = models.ImageField(upload_to='dashboard_img3/',storage=S3Boto3Storage(), blank=False, null=False)
+    dashboard_img4 = models.ImageField(upload_to='dashboard_img4/',storage=S3Boto3Storage(), blank=False, null=False)
+    dashboard_img5 = models.ImageField(upload_to='dashboard_img5/',storage=S3Boto3Storage(), blank=False, null=False)
+    dashboard_img6 = models.ImageField(upload_to='dashboard_img6/',storage=S3Boto3Storage(), blank=False, null=False)
+    dashboard_img7 = models.ImageField(upload_to='dashboard_img7/',storage=S3Boto3Storage(),blank=False, null=False)
+    dashboard_img8 = models.ImageField(upload_to='dashboard_img8/',storage=S3Boto3Storage(),blank=False, null=False)
 
 class SpaHome_welcome(models.Model):
     spa = models.ForeignKey(Spa, on_delete=models.CASCADE)
-    start_img = models.ImageField(upload_to='home_img/',blank=False, null=False)
+    start_img = models.ImageField(upload_to='home_img/',storage=S3Boto3Storage(),blank=False, null=False)
     welcome_content = models.TextField()
     slogan = models.TextField(default='Your Oasis Of Relaxation')
     
@@ -272,13 +272,13 @@ class Service(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    service_img = models.ImageField(upload_to='service_img/',blank=False, null=False)
+    service_img = models.ImageField(upload_to='service_img/',storage=S3Boto3Storage(),blank=False, null=False)
     is_active = models.BooleanField(default=True)
     def __str__(self): return f"{self.name} - {self.spa.spa_name}"
 
 class GalleryImage(models.Model):
     spa = models.ForeignKey(Spa, on_delete=models.CASCADE, related_name="gallery")
-    image = models.ImageField(upload_to='gallery/',blank=False, null=False)
+    image = models.ImageField(upload_to='gallery/',storage=S3Boto3Storage(),blank=False, null=False)
     caption = models.CharField(max_length=255, blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     def __str__(self): return f"Image for {self.spa.spa_name}"
@@ -383,7 +383,7 @@ class Product(models.Model):
     spa = models.ForeignKey(Spa, on_delete=models.CASCADE, related_name='products')
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    image = models.ImageField(upload_to='product_img/')
+    image = models.ImageField(upload_to='product_img/',storage=S3Boto3Storage())
     stock = models.PositiveIntegerField(default=0)
     discount = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
