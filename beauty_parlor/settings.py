@@ -13,10 +13,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from decouple import config
+from dotenv import load_dotenv
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv()
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -29,13 +32,14 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['atrium-wcno.onrender.com','localhost']
+ALLOWED_HOSTS = ['atrium-wcno.onrender.com','localhost','atriumproperties.us','media.atriumproperties.us']
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'jazzmin',
+    'storages',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'parlor',
     'corsheaders',
+    
 ]
 
 
@@ -57,15 +62,37 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "ATriUM",
     "copyright": "FalKoN AnaLyTiKs",
     "custom_css": "css/admin_custom.css",
-    
-    
     "changeform_format":"horizontal_tabs",
-    
     "navigation_expanded": True,
     "hide_apps":[],
     "hide_models":[],
     
 }
+
+
+
+# Cloudflare R2 settings
+
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Cloudflare R2 settings
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL')
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_REGION_NAME = 'auto'
+AWS_S3_FILE_OVERWRITE = False
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_CUSTOM_DOMAIN = 'media.atriumproperties.us'  # Add this
+# Use R2 for media files
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Media settings
+MEDIA_URL = 'https://media.atriumproperties.us/'
+MEDIA_ROOT = BASE_DIR / 'media'  # Local fallback (not used with R2)
 
 
 
@@ -184,9 +211,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
